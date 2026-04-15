@@ -1,0 +1,128 @@
+{% extends 'student/studentbase.html' %}
+{% block content %}
+{%load static%}
+
+<head>
+  <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+  <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+
+  <style media="screen">
+    a:link {
+      text-decoration: none;
+    }
+
+    h6 {
+      text-align: center;
+    }
+
+    .wrong-answer {
+      color: #d9534f;
+      font-weight: bold;
+    }
+
+    .correct-answer {
+      color: #5cb85c;
+      font-weight: bold;
+    }
+
+    .question-card {
+      background: #f9f9f9;
+      border-left: 4px solid #d9534f;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+
+    .score-display {
+      text-align: center;
+      padding: 20px;
+      background: #337ab7;
+      color: white;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+
+    .score-number {
+      font-size: 48px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<br><br>
+<div class="container">
+  <div class="score-display">
+    <h3>本次考试得分</h3>
+    <div class="score-number">{{ total_marks }}</div>
+    <p>课程：{{ course.course_name }}</p>
+  </div>
+
+  {% if wrong_answers %}
+  <div class="panel panel-danger">
+    <div class="panel-heading">
+      <h4 class="panel-title">本次错题回顾（共 {{ wrong_answers|length }} 道）</h4>
+    </div>
+    <div class="panel-body">
+      {% for wa in wrong_answers %}
+      <div class="question-card">
+        <h4><strong>第 {{ forloop.counter }} 题</strong> <span class="pull-right">[分值: {{ wa.question.marks }}]</span></h4>
+        <hr>
+        <p><strong>题目：</strong>{{ wa.question.question }}</p>
+        
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>选项：</strong></p>
+            <p>A. {{ wa.question.option1 }}</p>
+            <p>B. {{ wa.question.option2 }}</p>
+            <p>C. {{ wa.question.option3 }}</p>
+            <p>D. {{ wa.question.option4 }}</p>
+          </div>
+          <div class="col-md-6">
+            <p class="wrong-answer">
+              <strong>你的答案：</strong>
+              {% if wa.student_answer == 'Option1' %}{{ wa.question.option1 }}
+              {% elif wa.student_answer == 'Option2' %}{{ wa.question.option2 }}
+              {% elif wa.student_answer == 'Option3' %}{{ wa.question.option3 }}
+              {% elif wa.student_answer == 'Option4' %}{{ wa.question.option4 }}
+              {% else %}{{ wa.student_answer }}
+              {% endif %}
+              <span class="label label-danger">错误</span>
+            </p>
+            <p class="correct-answer">
+              <strong>正确答案：</strong>
+              {% if wa.question.answer == 'Option1' %}{{ wa.question.option1 }}
+              {% elif wa.question.answer == 'Option2' %}{{ wa.question.option2 }}
+              {% elif wa.question.answer == 'Option3' %}{{ wa.question.option3 }}
+              {% elif wa.question.answer == 'Option4' %}{{ wa.question.option4 }}
+              {% endif %}
+              <span class="label label-success">正确</span>
+            </p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="text-center" style="margin-bottom: 40px;">
+    <a href="{% url 'add-to-wrong-answer-book' %}" class="btn btn-primary btn-lg">
+      <span class="glyphicon glyphicon-plus"></span> 加入错题本
+    </a>
+    <a href="{% url 'view-result' %}" class="btn btn-default btn-lg" style="margin-left: 20px;">
+      返回成绩列表
+    </a>
+  </div>
+  {% else %}
+  <div class="alert alert-success text-center">
+    <h3>恭喜你！本次考试全部答对，没有错题！</h3>
+  </div>
+  <div class="text-center" style="margin-bottom: 40px;">
+    <a href="{% url 'view-result' %}" class="btn btn-default btn-lg">
+      返回成绩列表
+    </a>
+  </div>
+  {% endif %}
+</div>
+
+<br><br><br><br><br><br>
+{% endblock content %}

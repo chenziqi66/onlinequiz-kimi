@@ -86,6 +86,7 @@ def calculate_marks_view(request):
         course=QMODEL.Course.objects.get(id=course_id)
         
         total_marks=0
+        wrong_answers=[]
         questions=QMODEL.Question.objects.all().filter(course=course)
         for i in range(len(questions)):
             
@@ -93,12 +94,21 @@ def calculate_marks_view(request):
             actual_answer = questions[i].answer
             if selected_ans == actual_answer:
                 total_marks = total_marks + questions[i].marks
+            else:
+                wrong_answers.append({
+                    'question': questions[i],
+                    'student_answer': selected_ans if selected_ans else '未作答'
+                })
         student = models.Student.objects.get(user_id=request.user.id)
         result = QMODEL.Result()
         result.marks=total_marks
         result.exam=course
         result.student=student
         result.save()
+        
+        request.session['wrong_answers'] = wrong_answers
+        request.session['course_id'] = course_id
+        request.session['total_marks'] = total_marks
 
         return HttpResponseRedirect('view-result')
 
@@ -124,4 +134,74 @@ def check_marks_view(request,pk):
 def student_marks_view(request):
     courses=QMODEL.Course.objects.all()
     return render(request,'student/student_marks.html',{'courses':courses})
+
+@login_required(login_url='studentlogin')
+@user_passes_test(is_student)
+def view_wrong_answers_view(request):
+    wrong_answers = request.session.get('wrong_answers', [])
+    course_id = request.session.get('course_id')
+    total_marks = request.session.get('total_marks', 0)
+    course = None
+    if course_id:
+        course = QMODEL.Course.objects.get(id=course_id)
+    return render(request, 'student/view_wrong_answers.html', {
+        'wrong_answers': wrong_answers,
+        'course': course,
+        'total_marks': total_marks
+    })
+
+@login_required(login_url='studentlogin')
+@user_passes_test(is_student)
+def add_to_wrong_answer_book_view(request):
+    wrong_answers = request.session.get('wrong_answers', [])
+    course_id = request.session.get('course_id')
+    student = models.Student.objects.get(user_id=request.user.id)
+    
+    if course_id and wrong_answers:
+        course = QMODEL.Course.objects.get(id=course_id)
+        for wa in wrong_answers:
+            question = wa['question']
+            student_answer = wa['student_answer']
+            QMODEL.WrongAnswer.objects.get_or_create(
+                student=student,
+                question=question,
+                defaults={
+                    'exam': course,
+                    'student_answer': student_answer
+                }
+            )
+    
+    return redirect('wrong-answer-book')
+
+@login_required(login_url='studentlogin')
+@user_passes_test(is_student)
+def wrong_answer_book_view(request):
+    student = models.Student.objects.get(user_id=request.user.id)
+    wrong_answers = QMODEL.WrongAnswer.objects.filter(student=student).select_related('question', 'exam')
+    
+    total_count = wrong_answers.count()
+    
+    course_stats = {}
+    for wa in wrong_answers:
+        course_name = wa.exam.course_name
+        if course_name in course_stats:
+            course_stats[course_name] += 1
+        else:
+            course_stats[course_name] = 1
+    
+    recent_wrong_answers = wrong_answers.order_by('-date')[:10]
+    
+    return render(request, 'student/wrong_answer_book.html', {
+        'total_count': total_count,
+        'course_stats': course_stats,
+        'recent_wrong_answers': recent_wrong_answers
+    })
+
+@login_required(login_url='studentlogin')
+@user_passes_test(is_student)
+def wrong_answer_detail_view(request, pk):
+    wrong_answer = QMODEL.WrongAnswer.objects.select_related('question', 'exam').get(id=pk)
+    return render(request, 'student/wrong_answer_detail.html', {
+        'wrong_answer': wrong_answer
+    })
   

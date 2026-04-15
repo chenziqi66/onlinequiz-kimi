@@ -15,4 +15,9 @@ path('calculate-marks', views.calculate_marks_view,name='calculate-marks'),
 path('view-result', views.view_result_view,name='view-result'),
 path('check-marks/<int:pk>', views.check_marks_view,name='check-marks'),
 path('student-marks', views.student_marks_view,name='student-marks'),
+
+path('view-wrong-answers', views.view_wrong_answers_view, name='view-wrong-answers'),
+path('add-to-wrong-answer-book', views.add_to_wrong_answer_book_view, name='add-to-wrong-answer-book'),
+path('wrong-answer-book', views.wrong_answer_book_view, name='wrong-answer-book'),
+path('wrong-answer-detail/<int:pk>', views.wrong_answer_detail_view, name='wrong-answer-detail'),
 ]

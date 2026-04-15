@@ -36,6 +36,7 @@
           <th>Total Marks</th>
           <th>Attempt</th>
           <th>Exam Date</th>
+          <th>Action</th>
         </tr>
       </thead>
       {% for t in results %}
@@ -45,7 +46,13 @@
         <td> {{t.marks}}</td>
         <td>Attemp {{ forloop.counter }}</td>
         <td> {{t.date}}</td>
-        
+        <td>
+          {% if forloop.last %}
+          <a class="btn btn-info btn-xs" href="{% url 'view-wrong-answers' %}">
+            <span class="glyphicon glyphicon-eye-open"></span> 查看本次错题
+          </a>
+          {% endif %}
+        </td>
         
       </tr>
       {% endfor %}

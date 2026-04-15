@@ -1,0 +1,127 @@
+{% extends 'student/studentbase.html' %}
+{% block content %}
+{%load static%}
+
+<head>
+  <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+  <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+
+  <style media="screen">
+    a:link {
+      text-decoration: none;
+    }
+
+    .stats-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .stats-number {
+      font-size: 64px;
+      font-weight: bold;
+    }
+
+    .course-stat-item {
+      background: #f8f9fa;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border-left: 4px solid #337ab7;
+    }
+
+    .wrong-answer-item {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .wrong-answer-item:hover {
+      background: #ffeaa7;
+      transform: translateX(5px);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6c757d;
+    }
+
+    .empty-state i {
+      font-size: 80px;
+      margin-bottom: 20px;
+      color: #dee2e6;
+    }
+  </style>
+</head>
+<br><br>
+<div class="container">
+  <h2 style="text-align: center; margin-bottom: 30px;"><i class="fas fa-book-open"></i> 我的错题本</h2>
+
+  {% if total_count > 0 %}
+  <!-- 统计概览 -->
+  <div class="stats-card">
+    <div class="stats-number">{{ total_count }}</div>
+    <p style="font-size: 18px;">累计收集错题总数</p>
+  </div>
+
+  <div class="row">
+    <!-- 按课程分类统计 -->
+    <div class="col-md-6">
+      <div class="panel panel-info">
+        <div class="panel-heading">
+          <h4 class="panel-title"><i class="fas fa-chart-pie"></i> 按课程分类</h4>
+        </div>
+        <div class="panel-body">
+          {% for course_name, count in course_stats.items %}
+          <div class="course-stat-item">
+            <strong>{{ course_name }}</strong>
+            <span class="badge pull-right" style="background-color: #d9534f;">{{ count }} 道错题</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- 最近添加的错题 -->
+    <div class="col-md-6">
+      <div class="panel panel-warning">
+        <div class="panel-heading">
+          <h4 class="panel-title"><i class="fas fa-clock"></i> 最近添加的错题</h4>
+        </div>
+        <div class="panel-body">
+          {% for wa in recent_wrong_answers %}
+          <a href="{% url 'wrong-answer-detail' wa.id %}" style="color: inherit; text-decoration: none;">
+            <div class="wrong-answer-item">
+              <strong>{{ wa.exam.course_name }}</strong>
+              <p style="margin: 5px 0; color: #666;">{{ wa.question.question|truncatechars:50 }}</p>
+              <small class="text-muted">添加时间：{{ wa.date|date:"Y-m-d H:i" }}</small>
+            </div>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <i class="fas fa-book-open"></i>
+    <h3>错题本还是空的</h3>
+    <p>完成考试后，你可以将错题加入错题本进行复习</p>
+    <a href="{% url 'student-exam' %}" class="btn btn-primary btn-lg" style="margin-top: 20px;">
+      <i class="fas fa-book"></i> 去考试
+    </a>
+  </div>
+  {% endif %}
+</div>
+
+<br><br><br><br><br><br>
+{% endblock content %}

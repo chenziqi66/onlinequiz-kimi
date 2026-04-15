@@ -1,0 +1,137 @@
+{% extends 'student/studentbase.html' %}
+{% block content %}
+{%load static%}
+
+<head>
+  <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+  <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+
+  <style media="screen">
+    a:link {
+      text-decoration: none;
+    }
+
+    .wrong-answer {
+      color: #d9534f;
+      font-weight: bold;
+    }
+
+    .correct-answer {
+      color: #5cb85c;
+      font-weight: bold;
+    }
+
+    .question-card {
+      background: #f9f9f9;
+      border-left: 4px solid #d9534f;
+      padding: 25px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+
+    .option-item {
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 4px;
+    }
+
+    .option-wrong {
+      background: #f2dede;
+      border: 1px solid #ebccd1;
+    }
+
+    .option-correct {
+      background: #dff0d8;
+      border: 1px solid #d6e9c6;
+    }
+
+    .option-normal {
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+    }
+  </style>
+</head>
+<br><br>
+<div class="container">
+  <a href="{% url 'wrong-answer-book' %}" class="btn btn-default" style="margin-bottom: 20px;">
+    <i class="fas fa-arrow-left"></i> 返回错题本
+  </a>
+
+  <div class="question-card">
+    <div class="row">
+      <div class="col-md-8">
+        <h4><strong>{{ wrong_answer.exam.course_name }}</strong></h4>
+      </div>
+      <div class="col-md-4 text-right">
+        <span class="label label-primary">分值: {{ wrong_answer.question.marks }}</span>
+      </div>
+    </div>
+    <hr>
+    
+    <h4><strong>题目：</strong></h4>
+    <p style="font-size: 16px; line-height: 1.8;">{{ wrong_answer.question.question }}</p>
+    
+    <hr>
+    <h4><strong>选项：</strong></h4>
+    
+    {% with ans=wrong_answer.question.answer student_ans=wrong_answer.student_answer %}
+    <div class="option-item {% if ans == 'Option1' %}option-correct{% elif student_ans == 'Option1' %}option-wrong{% else %}option-normal{% endif %}">
+      <strong>A.</strong> {{ wrong_answer.question.option1 }}
+      {% if ans == 'Option1' %}<span class="label label-success pull-right">正确答案</span>{% endif %}
+      {% if student_ans == 'Option1' and ans != 'Option1' %}<span class="label label-danger pull-right">你的答案</span>{% endif %}
+    </div>
+    
+    <div class="option-item {% if ans == 'Option2' %}option-correct{% elif student_ans == 'Option2' %}option-wrong{% else %}option-normal{% endif %}">
+      <strong>B.</strong> {{ wrong_answer.question.option2 }}
+      {% if ans == 'Option2' %}<span class="label label-success pull-right">正确答案</span>{% endif %}
+      {% if student_ans == 'Option2' and ans != 'Option2' %}<span class="label label-danger pull-right">你的答案</span>{% endif %}
+    </div>
+    
+    <div class="option-item {% if ans == 'Option3' %}option-correct{% elif student_ans == 'Option3' %}option-wrong{% else %}option-normal{% endif %}">
+      <strong>C.</strong> {{ wrong_answer.question.option3 }}
+      {% if ans == 'Option3' %}<span class="label label-success pull-right">正确答案</span>{% endif %}
+      {% if student_ans == 'Option3' and ans != 'Option3' %}<span class="label label-danger pull-right">你的答案</span>{% endif %}
+    </div>
+    
+    <div class="option-item {% if ans == 'Option4' %}option-correct{% elif student_ans == 'Option4' %}option-wrong{% else %}option-normal{% endif %}">
+      <strong>D.</strong> {{ wrong_answer.question.option4 }}
+      {% if ans == 'Option4' %}<span class="label label-success pull-right">正确答案</span>{% endif %}
+      {% if student_ans == 'Option4' and ans != 'Option4' %}<span class="label label-danger pull-right">你的答案</span>{% endif %}
+    </div>
+    {% endwith %}
+    
+    <hr>
+    <div class="row">
+      <div class="col-md-6">
+        <p class="wrong-answer">
+          <strong>你的答案：</strong>
+          {% if wrong_answer.student_answer == 'Option1' %}{{ wrong_answer.question.option1 }}
+          {% elif wrong_answer.student_answer == 'Option2' %}{{ wrong_answer.question.option2 }}
+          {% elif wrong_answer.student_answer == 'Option3' %}{{ wrong_answer.question.option3 }}
+          {% elif wrong_answer.student_answer == 'Option4' %}{{ wrong_answer.question.option4 }}
+          {% else %}{{ wrong_answer.student_answer }}
+          {% endif %}
+        </p>
+      </div>
+      <div class="col-md-6">
+        <p class="correct-answer">
+          <strong>正确答案：</strong>
+          {% if wrong_answer.question.answer == 'Option1' %}{{ wrong_answer.question.option1 }}
+          {% elif wrong_answer.question.answer == 'Option2' %}{{ wrong_answer.question.option2 }}
+          {% elif wrong_answer.question.answer == 'Option3' %}{{ wrong_answer.question.option3 }}
+          {% elif wrong_answer.question.answer == 'Option4' %}{{ wrong_answer.question.option4 }}
+          {% endif %}
+        </p>
+      </div>
+    </div>
+    
+    <hr>
+    <p class="text-muted">
+      <i class="fas fa-clock"></i> 添加时间：{{ wrong_answer.date|date:"Y年m月d日 H:i" }}
+    </p>
+  </div>
+</div>
+
+<br><br><br><br><br><br>
+{% endblock content %}

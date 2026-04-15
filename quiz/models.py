@@ -25,3 +25,13 @@ class Result(models.Model):
     marks = models.PositiveIntegerField()
     date = models.DateTimeField(auto_now=True)
 
+class WrongAnswer(models.Model):
+    student = models.ForeignKey(Student,on_delete=models.CASCADE)
+    question = models.ForeignKey(Question,on_delete=models.CASCADE)
+    exam = models.ForeignKey(Course,on_delete=models.CASCADE)
+    student_answer = models.CharField(max_length=200)
+    date = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['student', 'question']
+
